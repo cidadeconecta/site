@@ -657,6 +657,10 @@ const PAGS = ['Pix', 'Cartão', 'Boleto'];
 const STATUS = ['Pago', 'Pago', 'Pago', 'Pago', 'Pendente', 'Reembolsado'];
 
 class Component extends DCLogic {
+  // LOGIN_ATIVO = false: o painel abre direto, sem tela de login.
+  // Volte para true quando a API estiver com o schema aplicado e o admin criado.
+  LOGIN_ATIVO = false;
+
   state = { logado: false, erro: false, erroMsg: '', entrando: false, aba: 'visao', produtos: [], vendas: [], editando: null,
     filtro: 'todos', cupons: [], integracoes: {}, salvouInt: false, carregandoVendas: false, erroVendas: '',
     categorias: [], usuarios: [], usuario: null, banco: false, msgAcesso: '', excluindo: null,
@@ -685,7 +689,7 @@ class Component extends DCLogic {
     } catch (e) {}
     let usuario = null;
     try { usuario = JSON.parse(sessionStorage.getItem('cc_admin_user') || 'null'); } catch (e) {}
-    const sessao = !!this.token();
+    const sessao = this.LOGIN_ATIVO ? !!this.token() : true;
     this.setState({ produtos: prods, vendas, logado: sessao, cupons, integracoes,
       usuario, categorias: this.categoriasLocais(prods) });
     if (sessao) { this.carregarCatalogo(); this.carregarUsuarios(); }
@@ -1196,6 +1200,7 @@ class Component extends DCLogic {
       sair: () => {
         try { sessionStorage.removeItem('cc_admin_token'); sessionStorage.removeItem('cc_admin_user'); } catch (e) {}
         localStorage.removeItem('cc_admin');
+        if (!this.LOGIN_ATIVO) { location.href = 'index.html'; return; }
         this.setState({ logado: false, usuario: null, usuarios: [] });
       },
       irAba: (e) => {
