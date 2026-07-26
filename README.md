@@ -1,49 +1,25 @@
 # Cidade Conecta — site
 
-Site estático da Cidade Conecta (GTA RolePlay / FiveM). Cada arquivo é autônomo:
-não precisa de build, servidor ou dependências.
+Site estático (HTML + CSS + JS, sem build). Suba **todo o conteúdo desta pasta** na raiz do repositório.
 
 | Arquivo | Página |
 | --- | --- |
 | index.html | Home |
 | loja.html | Loja VIP |
 | regras.html | Regulamento |
-| admin.html | Painel administrativo (login: admin / cidade2026) |
 
-## Publicar no GitHub Pages
+Também sobem junto: `support.js`, `image-slot.js`, `assets/`, `robots.txt`, `sitemap.xml` e `.nojekyll`.
 
-1. Crie o repositório `cidade-conecta-site` no GitHub (público).
-2. Envie o conteúdo desta pasta para a raiz do repositório (arraste os arquivos na
-   interface do GitHub ou use git):
+## GitHub Pages
+1. Envie os arquivos para a raiz do repositório (branch `main`).
+2. Settings → Pages → Source: **Deploy from a branch**, branch `main`, pasta `/ (root)`.
 
-   ```bash
-   git init
-   git add .
-   git commit -m "site Cidade Conecta"
-   git branch -M main
-   git remote add origin https://github.com/SEU-USUARIO/cidade-conecta-site.git
-   git push -u origin main
-   ```
+## Segurança — leia antes de publicar
+- O **painel administrativo não está neste pacote de propósito**. A versão atual valida usuário/senha no próprio navegador (o segredo fica visível no código-fonte) e guarda chaves da Tebex, token do bot do Discord e senha do banco no `localStorage`. Publicar isso expõe suas credenciais. Use o painel apenas localmente ou por trás de login real no backend.
+- Nunca cole a **Tebex Secret Key**, o **token do bot** ou a senha do MySQL em campos do navegador de uma página pública — esses valores pertencem ao backend (`backend/.env`).
+- As páginas já sobem com `Content-Security-Policy`, `referrer-policy` e `rel="noopener"` em todos os links externos.
+- Sendo estático, o site não tem banco nem formulários gravando dados: a superfície de ataque fica no backend e no Discord OAuth.
 
-3. No repositório: **Settings → Pages → Source: Deploy from a branch**,
-   branch `main`, pasta `/ (root)`, salvar.
-4. Em poucos minutos o site fica em
-   `https://SEU-USUARIO.github.io/cidade-conecta-site/`.
-
-### Domínio próprio (opcional)
-Crie um arquivo `CNAME` na raiz com o domínio (ex.: `cidadeconecta.gg`) e aponte
-no seu provedor de DNS um registro CNAME para `SEU-USUARIO.github.io`.
-
-## Observações importantes
-
-- **Painel admin:** publicado assim, ele é acessível por qualquer pessoa que
-  descubra a URL e os dados ficam apenas no navegador (localStorage). Para uso
-  real, hospede o painel atrás de autenticação de verdade ou remova
-  `admin.html` do repositório.
-- **Checkout:** o botão do carrinho leva para a webstore Tebex configurada em
-  Admin → Integrações. Ajuste o domínio da sua loja antes de divulgar.
-- **Links das redes sociais e do Discord** estão como `#` — troque pelas URLs
-  reais.
-- **Imagens:** os espaços de imagem são preenchidos arrastando arquivos na
-  ferramenta de edição; no site publicado eles aparecem como placeholders até
-  que você gere uma nova versão com as imagens aplicadas.
+## SEO
+- Cada página tem `title`, `description`, canonical, Open Graph e Twitter Card.
+- Ajuste o domínio nos canonical/OG e no `sitemap.xml` se publicar em domínio próprio.
