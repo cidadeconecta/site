@@ -691,7 +691,7 @@ const STATUS = ['Pago', 'Pago', 'Pago', 'Pago', 'Pendente', 'Reembolsado'];
 class Component extends DCLogic {
   // LOGIN_ATIVO = false: o painel abre direto, sem tela de login.
   // Volte para true quando a API estiver com o schema aplicado e o admin criado.
-  LOGIN_ATIVO = false;
+  LOGIN_ATIVO = true;
 
   state = { logado: false, erro: false, erroMsg: '', entrando: false, aba: 'visao', produtos: [], vendas: [], editando: null, msgBanco: '',
     filtro: 'todos', cupons: [], integracoes: {}, salvouInt: false, carregandoVendas: false, erroVendas: '',
