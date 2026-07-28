@@ -719,7 +719,6 @@ class Component extends DCLogic {
     try { prods = JSON.parse(localStorage.getItem('cc_produtos') || 'null'); } catch (e) {}
     if (!Array.isArray(prods)) prods = [];
     let vendas = [];
-    try { const v = JSON.parse(localStorage.getItem('cc_vendas') || '[]'); if (Array.isArray(v)) vendas = v; } catch (e) {}
     let cupons = [];
     try { const c = JSON.parse(localStorage.getItem('cc_cupons') || '[]'); if (Array.isArray(c)) cupons = c; } catch (e) {}
     let integracoes = {};
@@ -733,7 +732,7 @@ class Component extends DCLogic {
     const sessao = this.LOGIN_ATIVO ? !!this.token() : true;
     this.setState({ produtos: prods, vendas, logado: sessao, cupons, integracoes,
       usuario, categorias: this.categoriasLocais(prods) });
-    if (sessao) { this.carregarCatalogo(); this.carregarUsuarios(); }
+    if (sessao) { this.carregarCatalogo(); this.carregarUsuarios(); this.carregarConfiguracoes(); }
     if (integracoes.apiVendas) this.carregarVendas(integracoes.apiVendas);
     setTimeout(() => this.preencherIntegracoes(integracoes), 60);
 
@@ -839,6 +838,20 @@ class Component extends DCLogic {
     }).catch(() => this.setState({ usuarios: [] }));
   }
 
+  carregarConfiguracoes() {
+    this.api('/configuracoes').then((cfg) => {
+      if (cfg && cfg.integracoes) {
+        try { localStorage.setItem('cc_integracoes', JSON.stringify(cfg.integracoes)); } catch (e) {}
+        this.setState({ integracoes: cfg.integracoes });
+      }
+      if (cfg && cfg.hero) {
+        try { localStorage.setItem('cc_hero', JSON.stringify(cfg.hero)); } catch (e) {}
+      }
+      setTimeout(() => this.preencherIntegracoes(this.state.integracoes || {}), 80);
+      if (cfg && cfg.integracoes && cfg.integracoes.apiVendas) this.carregarVendas(cfg.integracoes.apiVendas);
+    }).catch(() => {});
+  }
+
   carregarVendas(url) {
     if (!url) return;
     this.setState({ carregandoVendas: true, erroVendas: '' });
@@ -865,7 +878,7 @@ class Component extends DCLogic {
         try { localStorage.setItem('cc_vendas', JSON.stringify(vendas)); } catch (e) {}
         this.setState({ vendas, carregandoVendas: false, erroVendas: '' });
       })
-      .catch((e) => this.setState({ carregandoVendas: false, erroVendas: 'Não foi possível ler o endpoint (' + e.message + ').' }));
+      .catch((e) => this.setState({ vendas: [], carregandoVendas: false, erroVendas: 'Não foi possível ler o endpoint (' + e.message + ').' }));
   }
 
 
@@ -1111,6 +1124,8 @@ class Component extends DCLogic {
         localStorage.setItem('cc_hero', JSON.stringify(hero));
         localStorage.setItem('cc_integracoes', JSON.stringify(conf));
         localStorage.setItem('cc_tebex', JSON.stringify({ ativo: conf.ativo === 0 ? false : true, loja: conf.loja }));
+        this.api('/configuracoes', { method: 'POST', body: { chave: 'hero', valor: hero } }).catch(() => {});
+        this.api('/configuracoes', { method: 'POST', body: { chave: 'integracoes', valor: conf } }).catch(() => {});
         this.setState({ integracoes: conf, salvouInt: true });
         if (conf.apiVendas) this.carregarVendas(conf.apiVendas);
         setTimeout(() => this.setState({ salvouInt: false }), 3000);
@@ -1265,6 +1280,7 @@ class Component extends DCLogic {
           this.setState({ logado: true, erro: false, erroMsg: '', entrando: false, usuario: j.usuario || null });
           this.carregarCatalogo();
           this.carregarUsuarios();
+          this.carregarConfiguracoes();
           setTimeout(() => this.preencherIntegracoes(this.state.integracoes || {}), 80);
         }).catch((err) => {
           const semRede = /failed|network|load/i.test(err.message || '');
