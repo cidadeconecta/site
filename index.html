@@ -1427,7 +1427,7 @@
               <div data-st="medical" style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:19px;color:#F2F6F9">—</div>
             </div>
             <div style="padding:16px 18px;background:rgba(201,211,220,.05);border-left:2px solid #14B8A6">
-              <div style="font-family:'Chakra Petch',sans-serif;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:#6E7F89">Ilegais online</div>
+              <div style="font-family:'Chakra Petch',sans-serif;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:#6E7F89">Criminosos na cidade</div>
               <div data-st="criminals" style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:19px;color:#F2F6F9">—</div>
             </div>
           </div>
@@ -2001,7 +2001,7 @@ class Component extends DCLogic {
     if (dot) { dot.style.background = cor; dot.style.boxShadow = '0 0 12px ' + cor; }
     const st = document.querySelector('[data-st="status"]');
     if (st) { st.style.color = cor; st.textContent = String(rotulo).toUpperCase(); }
-    if (!d) {
+    if (!d || !online) {
       ['ping', 'uptime', 'players', 'queue', 'police', 'medical', 'criminals'].forEach((k) => {
         const el = document.querySelector('[data-st="' + k + '"]');
         if (el) el.textContent = '—';
