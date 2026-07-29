@@ -1837,6 +1837,15 @@ class Component extends DCLogic {
         }
       })
       .catch(() => {});
+    fetch('https://api-production-bc755.up.railway.app/configuracoes/links', { headers: { Accept: 'application/json' } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((links) => {
+        if (links && Object.keys(links).length) {
+          try { localStorage.setItem('cc_links', JSON.stringify(links)); } catch (e) {}
+          this.aplicarLinks();
+        }
+      })
+      .catch(() => {});
     this.pintarCircuito();
     window.addEventListener('focus', () => { this.aplicarLinks(); this.aplicarHero(); this.carregarCupom(); });
     // recarregar sempre volta para o topo da home

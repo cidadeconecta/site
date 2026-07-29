@@ -583,6 +583,24 @@ class Component extends DCLogic {
     this.restaurarSessao();
     this.processarOAuth();
     this.aplicarLinks();
+    fetch(this.apiBase() + '/configuracoes/links', { headers: { Accept: 'application/json' } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((links) => {
+        if (links && Object.keys(links).length) {
+          try { localStorage.setItem('cc_links', JSON.stringify(links)); } catch (e) {}
+          this.aplicarLinks();
+        }
+      })
+      .catch(() => {});
+    fetch(this.apiBase() + '/configuracoes/cupons', { headers: { Accept: 'application/json' } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((cupons) => {
+        if (Array.isArray(cupons)) {
+          try { localStorage.setItem('cc_cupons', JSON.stringify(cupons)); } catch (e) {}
+          this.setState({ cupons });
+        }
+      })
+      .catch(() => {});
   }
 
   componentDidUpdate() { if (this._onResize) this._onResize(); }

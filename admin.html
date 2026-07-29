@@ -846,6 +846,13 @@ class Component extends DCLogic {
       if (cfg && cfg.hero) {
         try { localStorage.setItem('cc_hero', JSON.stringify(cfg.hero)); } catch (e) {}
       }
+      if (cfg && cfg.links) {
+        try { localStorage.setItem('cc_links', JSON.stringify(cfg.links)); } catch (e) {}
+      }
+      if (cfg && Array.isArray(cfg.cupons)) {
+        try { localStorage.setItem('cc_cupons', JSON.stringify(cfg.cupons)); } catch (e) {}
+        this.setState({ cupons: cfg.cupons });
+      }
       setTimeout(() => this.preencherIntegracoes(this.state.integracoes || {}), 80);
       if (cfg && cfg.integracoes && cfg.integracoes.apiVendas) this.carregarVendas(cfg.integracoes.apiVendas);
     }).catch(() => {});
@@ -1078,6 +1085,7 @@ class Component extends DCLogic {
         const lista = s.cupons.filter(c => c.codigo !== codigo).concat([novo]);
         localStorage.setItem('cc_cupons', JSON.stringify(lista));
         this.setState({ cupons: lista });
+        this.api('/configuracoes', { method: 'POST', body: { chave: 'cupons', valor: lista } }).catch(() => {});
         this.cCodigo.current.value = ''; this.cPct.current.value = ''; this.cValidade.current.value = ''; this.cLimite.current.value = '';
         if (this.cPublicar.current) this.cPublicar.current.checked = false;
       },
@@ -1087,18 +1095,21 @@ class Component extends DCLogic {
         const lista = s.cupons.map(c => Object.assign({}, c, { publicar: c.codigo === cod ? !c.publicar : false }));
         localStorage.setItem('cc_cupons', JSON.stringify(lista));
         this.setState({ cupons: lista });
+        this.api('/configuracoes', { method: 'POST', body: { chave: 'cupons', valor: lista } }).catch(() => {});
       },
       alternarCupom: (e) => {
         const cod = e.currentTarget.getAttribute('data-cod');
         const lista = s.cupons.map(c => c.codigo === cod ? Object.assign({}, c, { ativo: c.ativo === 0 ? 1 : 0 }) : c);
         localStorage.setItem('cc_cupons', JSON.stringify(lista));
         this.setState({ cupons: lista });
+        this.api('/configuracoes', { method: 'POST', body: { chave: 'cupons', valor: lista } }).catch(() => {});
       },
       excluirCupom: (e) => {
         const cod = e.currentTarget.getAttribute('data-cod');
         const lista = s.cupons.filter(c => c.codigo !== cod);
         localStorage.setItem('cc_cupons', JSON.stringify(lista));
         this.setState({ cupons: lista });
+        this.api('/configuracoes', { method: 'POST', body: { chave: 'cupons', valor: lista } }).catch(() => {});
       },
       salvarIntegracoes: (e) => {
         e.preventDefault();
@@ -1125,6 +1136,7 @@ class Component extends DCLogic {
         localStorage.setItem('cc_tebex', JSON.stringify({ ativo: conf.ativo === 0 ? false : true, loja: conf.loja }));
         this.api('/configuracoes', { method: 'POST', body: { chave: 'hero', valor: hero } }).catch(() => {});
         this.api('/configuracoes', { method: 'POST', body: { chave: 'integracoes', valor: conf } }).catch(() => {});
+        this.api('/configuracoes', { method: 'POST', body: { chave: 'links', valor: links } }).catch(() => {});
         this.setState({ integracoes: conf, salvouInt: true });
         if (conf.apiVendas) this.carregarVendas(conf.apiVendas);
         setTimeout(() => this.setState({ salvouInt: false }), 3000);
