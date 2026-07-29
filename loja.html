@@ -136,7 +136,9 @@
               <div style="position:relative;overflow:hidden;background:linear-gradient(160deg,rgba(14,32,40,.95),rgba(11,15,23,.95));border:1px solid rgba(201,211,220,.1);transition:transform .3s,border-color .3s" style-hover="transform:translateY(-8px);border-color:rgba(0,174,239,.5)">
                 <div style="position:relative;height:190px;border-bottom:1px solid rgba(201,211,220,.1);cursor:pointer" onClick="{{ verProduto }}" data-id="{{ p.id }}">
                   <image-slot id="{{ p.slot }}" src="{{ p.img }}" shape="rect" placeholder="{{ p.ph }}"></image-slot>
-                  <span style="position:absolute;top:12px;left:12px;padding:6px 13px;background:{{ p.tagBg }};color:{{ p.tagCor }};font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase">{{ p.tag }}</span>
+                  <sc-if value="{{ p.temTag }}" hint-placeholder-val="{{ false }}">
+                    <span style="position:absolute;top:12px;left:12px;padding:6px 13px;background:{{ p.tagBg }};color:{{ p.tagCor }};font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase">{{ p.tag }}</span>
+                  </sc-if>
                 </div>
                 <div style="padding:22px 22px 24px">
                   <div style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#7C3AED;margin-bottom:8px">{{ p.cat }}</div>
@@ -749,7 +751,7 @@ class Component extends DCLogic {
     }));
 
     const produtos = lista.map(p => ({
-      id: p.id, nome: p.nome, cat: p.cat, tag: p.tag, slot: 'prod-' + p.id, ph: p.nome, img: p.img || '',
+      id: p.id, nome: p.nome, cat: p.cat, tag: p.tag, temTag: !!(p.tag && String(p.tag).trim()), slot: 'prod-' + p.id, ph: p.nome, img: p.img || '',
       precoFmt: this.fmt(p.preco), antigoFmt: p.antigo ? this.fmt(p.antigo) : '',
       tagBg: (TAG_CORES[p.tag] || TAG_CORES['Início'])[0], tagCor: (TAG_CORES[p.tag] || TAG_CORES['Início'])[1],
     }));
