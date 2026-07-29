@@ -1711,10 +1711,12 @@ class Component extends DCLogic {
     };
 
     const fillBar = () => {
-      if (this._barDone || !this.barRef.current) return;
+      // Preenchimento decorativo antigo — a barra de jogadores agora nasce recolhida
+      // (width:0) e só é preenchida pelo status real da API (aplicarStatus). Antes,
+      // esta animação de entrada sobrescrevia a barra com um valor falso ao rolar a
+      // tela, fazendo ela aparecer parcialmente cheia mesmo com o servidor offline.
+      if (this._barDone) return;
       this._barDone = true;
-      const pct = Math.max(4, Math.min(100, ((this.props.playersOnline ?? 128) / 200) * 100));
-      this.barRef.current.style.width = pct + '%';
     };
 
     const near = (el, m) => {

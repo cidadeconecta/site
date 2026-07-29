@@ -1412,6 +1412,7 @@ class Component extends DCLogic {
         const nome = e.currentTarget.getAttribute('data-cat');
         const usados = s.produtos.filter((p) => p.cat === nome).length;
         if (usados) { window.alert('Esta categoria tem ' + usados + ' produto(s). Mova ou exclua os produtos antes.'); return; }
+        if (!window.confirm('Excluir a categoria "' + nome + '"? Esta ação não pode ser desfeita.')) return;
         const alvo = s.categorias.find((c) => c.nome === nome);
         const cats = s.categorias.filter((c) => c.nome !== nome);
         this.guardarCategorias(cats);

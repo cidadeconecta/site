@@ -601,6 +601,15 @@ class Component extends DCLogic {
         }
       })
       .catch(() => {});
+    fetch(this.apiBase() + '/configuracoes/tebex', { headers: { Accept: 'application/json' } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((tb) => {
+        if (tb && tb.loja) {
+          try { localStorage.setItem('cc_tebex', JSON.stringify(tb)); } catch (e) {}
+          this.setState({ tebex: tb });
+        }
+      })
+      .catch(() => {});
   }
 
   componentDidUpdate() { if (this._onResize) this._onResize(); }
