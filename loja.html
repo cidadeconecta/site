@@ -170,15 +170,15 @@
         <button onClick="{{ voltarLoja }}" style="margin-bottom:28px;padding:12px 22px;background:transparent;border:1px solid rgba(201,211,220,.2);color:#C9D3DC;cursor:pointer;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:14px;letter-spacing:.16em;text-transform:uppercase" style-hover="border-color:#00AEEF;color:#00AEEF">← Voltar para a loja</button>
         <div data-twocol="1fr 1fr" style="display:grid;grid-template-columns:1fr 1fr;gap:46px;align-items:start">
           <div>
-            <div style="position:relative;aspect-ratio:3/2;border:1px solid rgba(0,174,239,.25);clip-path:polygon(0 34px,34px 0,100% 0,100% calc(100% - 34px),calc(100% - 34px) 100%,0 100%)">
-              <image-slot id="{{ ativoSlot }}" src="{{ ativoImg }}" shape="rect" placeholder="Imagem do produto — 1200 × 800 px (3:2)"></image-slot>
+            <div style="position:relative;aspect-ratio:1200/675;border:1px solid rgba(0,174,239,.25);clip-path:polygon(0 34px,34px 0,100% 0,100% calc(100% - 34px),calc(100% - 34px) 100%,0 100%)">
+              <image-slot id="{{ ativoSlot }}" src="{{ ativoImg }}" shape="rect" placeholder="Imagem do produto — 1200 × 675 px (16:9)"></image-slot>
             </div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px">
               <sc-for list="{{ ativoGaleria }}" as="g" hint-placeholder-count="3">
                 <div style="position:relative;aspect-ratio:3/2;border:1px solid rgba(201,211,220,.14)"><image-slot id="{{ g.slot }}" src="{{ g.url }}" shape="rect" placeholder="{{ g.rotulo }}"></image-slot></div>
               </sc-for>
             </div>
-            <p style="margin:12px 0 0;font-family:'Chakra Petch',sans-serif;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:#6E7F89">Foto principal 1200 × 800 px · galeria 600 × 400 px — proporção 3:2</p>
+            <p style="margin:12px 0 0;font-family:'Chakra Petch',sans-serif;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:#6E7F89">Foto principal 1200 × 675 px (16:9) · galeria 600 × 400 px (3:2)</p>
           </div>
           <div>
             <div style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:14px;letter-spacing:.26em;text-transform:uppercase;color:#7C3AED;margin-bottom:12px">{{ ativoCat }}</div>
