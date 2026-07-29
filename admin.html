@@ -98,7 +98,7 @@
 
       <main style="padding:30px 30px 60px;min-width:0">
         <sc-if value="{{ temMsgBanco }}" hint-placeholder-val="{{ false }}">
-          <div style="margin-bottom:16px;padding:12px 16px;border:1px solid rgba(0,174,239,.35);background:rgba(0,174,239,.09);font-size:14px;color:#00AEEF">{{ msgBanco }}</div>
+          <div style="margin-bottom:16px;padding:12px 16px;border:1px solid {{ corMsgBanco }};background:{{ fundoMsgBanco }};font-size:14px;font-weight:600;color:{{ corMsgBanco }}">{{ msgBanco }}</div>
         </sc-if>
         <div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-bottom:26px">
           <div>
@@ -692,7 +692,7 @@ class Component extends DCLogic {
   // Volte para true quando a API estiver com o schema aplicado e o admin criado.
   LOGIN_ATIVO = true;
 
-  state = { logado: false, erro: false, erroMsg: '', entrando: false, aba: 'visao', produtos: [], vendas: [], editando: null, msgBanco: '',
+  state = { logado: false, erro: false, erroMsg: '', entrando: false, aba: 'visao', produtos: [], vendas: [], editando: null, msgBanco: '', msgBancoErro: false,
     filtro: 'todos', cupons: [], integracoes: {}, salvouInt: false, carregandoVendas: false, erroVendas: '',
     categorias: [], usuarios: [], usuario: null, banco: false, msgAcesso: '', excluindo: null,
     fBusca: '', fCat: 'todas', fStatusProd: 'todos', fPrecoMin: '', fPrecoMax: '',
@@ -773,11 +773,35 @@ class Component extends DCLogic {
 
   // grava no banco pela API e avisa em texto o que aconteceu
   gravar(rota, corpo, sucesso) {
-    this.setState({ msgBanco: 'Gravando no banco…' });
+    this.setState({ msgBanco: 'Gravando no banco…', msgBancoErro: false });
     this.api(rota, { method: 'POST', body: corpo })
-      .then(() => this.setState({ msgBanco: sucesso }))
-      .catch((e) => this.setState({ msgBanco: 'Salvo apenas neste navegador — a API respondeu: ' + (e.message || 'sem resposta') }));
-    setTimeout(() => { if (this.state.msgBanco) this.setState({ msgBanco: '' }); }, 6000);
+      .then(() => {
+        this.setState({ msgBanco: sucesso, msgBancoErro: false });
+        setTimeout(() => { if (this.state.msgBanco === sucesso) this.setState({ msgBanco: '' }); }, 6000);
+      })
+      .catch((e) => {
+        if (e.status === 401) {
+          this.forcarRelogin('Sua sessão expirou e isto NÃO foi salvo no banco (só neste navegador). Faça login de novo e salve outra vez.');
+        } else {
+          this.setState({ msgBancoErro: true, msgBanco: 'Salvo apenas neste navegador — a API respondeu: ' + (e.message || 'sem resposta') });
+        }
+      });
+  }
+
+  // sessão expirou no meio de uma ação: desloga e mostra o motivo na tela de login,
+  // que é a única tela visível depois do logout (o banner do painel some junto)
+  forcarRelogin(motivo) {
+    try { sessionStorage.removeItem('cc_admin_token'); sessionStorage.removeItem('cc_admin_user'); } catch (err) {}
+    this.setState({ logado: false, usuario: null, erro: true, erroMsg: motivo });
+  }
+
+  // mesma checagem de sessão para chamadas "silenciosas" (excluir, etc.)
+  chamadaSilenciosa(promessa) {
+    promessa.catch((e) => {
+      if (e && e.status === 401) {
+        this.forcarRelogin('Sua sessão expirou e isto NÃO foi salvo no banco (só neste navegador). Faça login de novo e repita a ação.');
+      }
+    });
   }
 
   apiBase() {
@@ -1018,9 +1042,7 @@ class Component extends DCLogic {
 
     const pags = PAGS.map(nome => {
       const n = pagas.filter(v => v.pagamento === nome).length;
-      return {
-      msgBanco: s.msgBanco || '',
-      temMsgBanco: !!s.msgBanco, nome, pct: Math.round((n / Math.max(1, pagas.length)) * 100) + '%' };
+      return { nome, pct: Math.round((n / Math.max(1, pagas.length)) * 100) + '%' };
     });
 
     const busca = (s.vBusca || '').trim().toLowerCase();
@@ -1042,6 +1064,9 @@ class Component extends DCLogic {
 
     return {
       logado: s.logado, deslogado: !s.logado, erroLogin: s.erro,
+      msgBanco: s.msgBanco || '', temMsgBanco: !!s.msgBanco,
+      corMsgBanco: s.msgBancoErro ? '#F87171' : '#00AEEF',
+      fundoMsgBanco: s.msgBancoErro ? 'rgba(248,113,113,.09)' : 'rgba(0,174,239,.09)',
       abaVisao: s.logado && s.aba === 'visao', abaProdutos: s.logado && s.aba === 'produtos',
       abaVendas: s.logado && s.aba === 'vendas', abaRelatorios: s.logado && s.aba === 'relatorios',
       abaCupons: s.logado && s.aba === 'cupons', abaIntegracoes: s.logado && s.aba === 'integracoes',
@@ -1336,7 +1361,7 @@ class Component extends DCLogic {
         const prods = s.produtos.filter(x => x.id !== p.id);
         this.persistir(prods);
         this.setState({ produtos: prods, excluindo: null });
-        if (this.token()) this.api('/produtos/' + encodeURIComponent(p.id), { method: 'DELETE' }).catch(() => {});
+        if (this.token()) this.chamadaSilenciosa(this.api('/produtos/' + encodeURIComponent(p.id), { method: 'DELETE' }));
       },
       fecharForm: () => this.setState({ editando: null }),
       salvar: (e) => {
@@ -1382,7 +1407,6 @@ class Component extends DCLogic {
         this.gravar('/categorias', { slug: this.slug(nome), nome }, 'Categoria gravada no banco.');
         this.setState({ categorias: cats });
         if (campo) campo.value = '';
-        if (this.token()) this.api('/categorias', { method: 'POST', body: { nome } }).catch(() => {});
       },
       excluirCategoria: (e) => {
         const nome = e.currentTarget.getAttribute('data-cat');
@@ -1392,7 +1416,7 @@ class Component extends DCLogic {
         const cats = s.categorias.filter((c) => c.nome !== nome);
         this.guardarCategorias(cats);
         this.setState({ categorias: cats });
-        if (this.token() && alvo) this.api('/categorias/' + encodeURIComponent(alvo.slug), { method: 'DELETE' }).catch(() => {});
+        if (this.token() && alvo) this.chamadaSilenciosa(this.api('/categorias/' + encodeURIComponent(alvo.slug), { method: 'DELETE' }));
       },
       filtrarStatus: (e) => this.setState({ filtro: e.target.value }),
     };
