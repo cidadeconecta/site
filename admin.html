@@ -190,8 +190,7 @@
           <div>
             <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:20px">
               <span style="font-family:'Chakra Petch',sans-serif;font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:#8FA0AA">{{ totalProdutos }} produtos cadastrados</span>
-              <button onClick="{{ limparCatalogo }}" style="margin-left:auto;padding:14px 22px;background:transparent;border:1px solid rgba(124,58,237,.4);color:#7C3AED;cursor:pointer;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:13.5px;letter-spacing:.14em;text-transform:uppercase" style-hover="border-color:#7C3AED;background:rgba(124,58,237,.1)">Limpar catálogo</button>
-              <button onClick="{{ novoProduto }}" style="padding:14px 30px;background:linear-gradient(135deg,#7C3AED,#00AEEF 55%,#14B8A6);color:#0B0F17;border:none;cursor:pointer;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:14.5px;letter-spacing:.16em;text-transform:uppercase;clip-path:polygon(13px 0,100% 0,calc(100% - 13px) 100%,0 100%)">+ Novo produto</button>
+              <button onClick="{{ novoProduto }}" style="margin-left:auto;padding:14px 30px;background:linear-gradient(135deg,#7C3AED,#00AEEF 55%,#14B8A6);color:#0B0F17;border:none;cursor:pointer;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:14.5px;letter-spacing:.16em;text-transform:uppercase;clip-path:polygon(13px 0,100% 0,calc(100% - 13px) 100%,0 100%)">+ Novo produto</button>
             </div>
 
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end;padding:18px 20px;margin-bottom:18px;background:rgba(10,27,34,.9);border:1px solid rgba(201,211,220,.1)">
@@ -237,7 +236,7 @@
               </div>
               <sc-for list="{{ produtos }}" as="p" hint-placeholder-count="5">
                 <div data-linha style="display:grid;grid-template-columns:70px 1fr 150px 130px 120px 150px;gap:14px;align-items:center;padding:14px 20px;border-bottom:1px solid rgba(201,211,220,.07)">
-                  <div style="width:56px;height:44px;border:1px solid rgba(201,211,220,.14);background:{{ p.thumb }};background-size:cover;background-position:center"></div>
+                  <div style="width:56px;height:31.5px;border:1px solid rgba(201,211,220,.14);background-color:rgba(201,211,220,.08);background-image:{{ p.thumb }};background-size:contain;background-repeat:no-repeat;background-position:center"></div>
                   <div style="min-width:0">
                     <div style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:16px;color:#F2F6F9">{{ p.nome }}</div>
                     <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#6E7F89">{{ p.id }}</div>
@@ -1149,7 +1148,7 @@ class Component extends DCLogic {
       }).map(p => ({
         id: p.id, nome: p.nome, cat: p.cat, precoFmt: this.fmt(p.preco),
         status: p.ativo ? 'Ativo' : 'Oculto', statusCor: p.ativo ? '#14B8A6' : '#6E7F89',
-        thumb: p.img ? 'url(' + p.img + ')' : 'rgba(201,211,220,.08)',
+        thumb: p.img ? 'url(' + p.img + ')' : 'none',
       })),
       totalProdutos: s.produtos.length, ativos: s.produtos.filter(p => p.ativo).length,
       // filtros de produtos
